@@ -11,10 +11,23 @@ const AddNewProduct = async (req, res) => {
 
 const GetProducts = async (req, res) => {
 	try {
-		const products = await Product.find()
-		return res.status(200).json({ data: products })
+		const { name, category } = req.query
+		const nameRegExp = new RegExp(name, 'i')
+		const categoryRegExp = new RegExp(category, 'i')
+
+		const total = await Product.countDocuments({
+			name: nameRegExp,
+			category: categoryRegExp,
+		})
+
+		const products = await Product.find({
+			name: nameRegExp,
+			category: categoryRegExp,
+		})
+
+		return res.status(200).json({ data: products, total })
 	} catch (error) {
-		return res.status(500).json({ message: error.message })
+		return sendErrorResponse(res, 500, 'Internal server error.')
 	}
 }
 
@@ -63,27 +76,10 @@ const DeleteProduct = async (req, res) => {
 	}
 }
 
-const SearchProduct = async (req, res) => {
-	try {
-		let data = await Product.find({
-			$or: [
-				{ name: { $regex: req.params.key } },
-				// { category: { $regex: req.params.key } },
-				// { category: { $regex: req.params.key } }
-				// { description: { $regex: req.params.key } },
-			],
-		})
-		return res.status(200).json({ data })
-	} catch (error) {
-		return res.status(500).json({ message: error.message })
-	}
-}
-
 module.exports = {
 	AddNewProduct,
 	GetProducts,
 	GetOneProduct,
 	UpdateProduct,
 	DeleteProduct,
-	SearchProduct,
 }
