@@ -4,14 +4,16 @@ const ProductRoutes = require('./routes/productRoutes')
 const CategoryRoutes = require('./routes/categoryRoutes')
 const AdminRoutes = require('./routes/adminRoutes')
 const isAuth = require('./middleware/isAuth')
+const cors = require('cors')
+
 const app = express()
-require('dotenv').config();
+require('dotenv').config()
 
-
+app.use(cors())
 app.use(express.json())
 app.use('/api/products', ProductRoutes)
 app.use('/api/category', CategoryRoutes)
-app.use('/api/admin', isAuth ,AdminRoutes)
+app.use('/api/admin', isAuth, AdminRoutes)
 
 async function RunApp() {
 	try {
