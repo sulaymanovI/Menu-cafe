@@ -6,6 +6,7 @@ const {
 	UpdateAdminData,
 	GetAdmins,
 	DeleteAdmin,
+	upload,
 } = require('../controllers/adminControllers')
 const router = express.Router()
 

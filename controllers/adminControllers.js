@@ -12,10 +12,15 @@ const GetAdmins = async (req, res) => {
 }
 
 const CreateNewAdmin = async (req, res) => {
-	const { fullname,phoneNumber, password } = req.body
+	const { fullname, phoneNumber, password, image } = req.body
 	try {
 		const hashedPassword = await bcrypt.hash(password, 10)
-		const admin = await Admin.create({ fullname, phoneNumber, password: hashedPassword })
+		const admin = await Admin.create({
+			fullname,
+			phoneNumber,
+			password: hashedPassword,
+			image,
+		})
 		const token = generateJWTToken(admin._id)
 		return res.status(200).json({
 			message: `Admin muvaffaqiyatli qo'shildi`,
@@ -77,7 +82,7 @@ const UpdateAdminData = async (req, res) => {
 			message: 'User has been updated successfully',
 		})
 	} catch (error) {
-		return res.status(500).json({ message: error.message})
+		return res.status(500).json({ message: error.message })
 	}
 }
 

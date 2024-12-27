@@ -5,12 +5,15 @@ const CategoryRoutes = require('./routes/categoryRoutes')
 const AdminRoutes = require('./routes/adminRoutes')
 const isAuth = require('./middleware/isAuth')
 const cors = require('cors')
+const uploadFile = require('./middleware/uploadFile')
 
 const app = express()
 require('dotenv').config()
 
+app.post("/api/upload", isAuth, (req, res) => uploadFile(req, res));
 app.use(cors())
 app.use(express.json())
+app.use('/uploads', express.static('uploads'));
 app.use('/api/products', ProductRoutes)
 app.use('/api/category', CategoryRoutes)
 app.use('/api/admin', isAuth, AdminRoutes)
