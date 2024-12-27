@@ -11,23 +11,29 @@ const AddNewProduct = async (req, res) => {
 
 const GetProducts = async (req, res) => {
 	try {
-		const { name, category } = req.query
-		const nameRegExp = new RegExp(name, 'i')
-		const categoryRegExp = new RegExp(category, 'i')
+		const { name, category, liked } = req.query
 
-		const total = await Product.countDocuments({
-			name: nameRegExp,
-			category: categoryRegExp,
-		})
+		const nameRegExp = name ? new RegExp(name, 'i') : undefined
+		const categoryRegExp = category ? new RegExp(category, 'i') : undefined
 
-		const products = await Product.find({
-			name: nameRegExp,
-			category: categoryRegExp,
-		})
+		let likedFilter = {}
+		if (liked !== undefined) {
+			likedFilter.liked = liked === 'true'
+		}
+
+		const filter = {
+			...(name && { name: nameRegExp }),
+			...(category && { category: categoryRegExp }),
+			...likedFilter,
+		}
+
+		const total = await Product.countDocuments(filter)
+
+		const products = await Product.find(filter)
 
 		return res.status(200).json({ data: products, total })
 	} catch (error) {
-		return sendErrorResponse(res, 500, 'Internal server error.')
+		return res.status(500).json({ message: error.message })
 	}
 }
 
@@ -76,10 +82,27 @@ const DeleteProduct = async (req, res) => {
 	}
 }
 
+const likeFunc = async (req, res) => {
+	try {
+		const { id } = req.params
+		const product = await Product.findById(id)
+		if (!product) {
+			return res.status(404).json({ message: 'Mahsulot topilmadi' })
+		}
+		product.liked = !product.liked
+		await product.save()
+
+		return res.status(200).json({ message: product })
+	} catch (error) {
+		return res.status(500).json({ message: error.message })
+	}
+}
+
 module.exports = {
 	AddNewProduct,
 	GetProducts,
 	GetOneProduct,
 	UpdateProduct,
 	DeleteProduct,
+	likeFunc,
 }
